@@ -834,6 +834,24 @@ public final class MoreTypes {
         }
     }
 
+    public static boolean isTargetType(TypeElement typeElement, String target) {
+        Logger.debug("Checking typeElement: %s", typeElement);
+        TypeMirror typeMirror = typeElement.getSuperclass();
+        if (typeMirror.toString().equals(target)) return true;
+        TypeMirror superMirror = asTypeElement(typeMirror).getSuperclass();
+        while (superMirror != null) {
+            typeMirror = superMirror;
+            Logger.debug("isTargetType: %s, %s", target, typeMirror);
+            if (typeMirror.toString().equals(target)) return true;
+            try {
+                superMirror = asTypeElement(typeMirror).getSuperclass();
+            } catch (Throwable e) {
+                break;
+            }
+        }
+        return false;
+    }
+
     private static class CastingTypeVisitor<T> extends SimpleTypeVisitor6<T, String> {
         @Override
         protected T defaultAction(TypeMirror e, String label) {

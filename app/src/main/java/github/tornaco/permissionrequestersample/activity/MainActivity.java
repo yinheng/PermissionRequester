@@ -20,7 +20,8 @@ import github.tornaco.permissionrequestersample.R;
 import github.tornaco.permissionrequestersample.com.comp.deep.WhoAmI;
 
 @RuntimePermissions
-public class MainActivity extends AppCompatActivity {
+public
+class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
 

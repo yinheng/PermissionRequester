@@ -35,10 +35,12 @@ import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
+import javax.lang.model.util.Types;
 
 import github.tornaco.permission.compiler.common.Collections;
 import github.tornaco.permission.compiler.common.Logger;
 import github.tornaco.permission.compiler.common.MoreElements;
+import github.tornaco.permission.compiler.common.MoreTypes;
 import github.tornaco.permission.compiler.common.SettingsProvider;
 import github.tornaco.permission.requester.RequiresPermission;
 import github.tornaco.permission.requester.RuntimePermissions;
@@ -60,11 +62,13 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
     private static final boolean DEBUG = true;
 
     private ErrorReporter mErrorReporter;
+    private Types mTypes;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         mErrorReporter = new ErrorReporter(processingEnvironment);
+        mTypes = processingEnvironment.getTypeUtils();
     }
 
     @Override
@@ -200,11 +204,11 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
                             onDenied,
                             requiresPermission));
                 } catch (Throwable t) {
-                    StringBuilder stacks = new StringBuilder();
-                    for (StackTraceElement se : t.getStackTrace()) {
-                        stacks.append(se.toString()).append("\n");
-                    }
-                    mErrorReporter.abortWithError(stacks.toString(), e);
+//                    StringBuilder stacks = new StringBuilder();
+//                    for (StackTraceElement se : t.getStackTrace()) {
+//                        stacks.append(se.toString()).append("\n");
+//                    }
+                    mErrorReporter.abortWithError(t.getLocalizedMessage(), e);
                 }
             }
         });
@@ -272,7 +276,7 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
         int requestCode = REQUEST_CODE.incrementAndGet();
 
         String methodToCallInRunnable = e.getSimpleName().toString();
-        StringBuilder onGrantPassingArgs = new StringBuilder("activity." + methodToCallInRunnable + "(");
+        StringBuilder onGrantPassingArgs = new StringBuilder("host." + methodToCallInRunnable + "(");
         for (int i = 0; i < parameterSpecs.size(); i++) {
             ParameterSpec parameterSpec = parameterSpecs.get(i);
             if (i != parameterSpecs.size() - 1)
@@ -285,7 +289,7 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
         String onBeforeMethodName = null;
         if (before != null) onBeforeMethodName = before.value();
         String onBeforeCode = before == null ? ""
-                : "activity." + onBeforeMethodName + "();\n";
+                : "host." + onBeforeMethodName + "();\n";
 
         // OnDenied.
         String onDeniedMethodName = null;
@@ -295,15 +299,27 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
                 "Runnable r2 = new Runnable() {\n" +
                         "            @Override\n" +
                         "            public void run() {\n" +
-                        "                activity." + onDeniedMethodName + "();\n" +
+                        "                host." + onDeniedMethodName + "();\n" +
                         "            }\n" +
                         "        };\n" +
                         "ON_DENY_METHODS_MAP.put(code, r2);\n";
 
+        // Check host is Activity or Fragment.
+        boolean isActivity;
+        boolean isFragment;
+
+        isActivity = MoreTypes.isTargetType(typeElement, "android.app.Activity");
+        isFragment = MoreTypes.isTargetType(typeElement, "android.app.Fragment")
+                || MoreTypes.isTargetType(typeElement, "android.support.v4.app.Fragment");
+
+        if (!isActivity && !isFragment) {
+            mErrorReporter.abortWithError("Only Activity or Fragment is accepted", typeElement);
+        }
+
         MethodSpec.Builder methodSpecBuilder =
                 MethodSpec.methodBuilder(methodName)
                         .addParameters(parameterSpecs)
-                        .addParameter(ClassName.bestGuess(typeElement.getQualifiedName().toString()), "activity", FINAL)
+                        .addParameter(ClassName.bestGuess(typeElement.getQualifiedName().toString()), "host", FINAL)
                         .addCode(onBeforeCode)
                         .addStatement(permStatement.toString(), permArgs)
                         .addStatement("int code = $L", requestCode)
@@ -317,7 +333,10 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
                                 "        };\n")
                         .addStatement("ON_GRANT_METHODS_MAP.put(code, r)")
                         .addCode(onDeniedCode)
-                        .addStatement("android.support.v4.app.ActivityCompat.requestPermissions(activity, permissions, code)")
+                        .addStatement(
+                                isActivity ?
+                                        "android.support.v4.app.ActivityCompat.requestPermissions(host, permissions, code)"
+                                        : "android.support.v4.app.ActivityCompat.requestPermissions(host.getActivity(), permissions, code)")
                         .addModifiers(Modifier.STATIC)
                         .addModifiers(Modifier.FINAL);
         return methodSpecBuilder.build();
