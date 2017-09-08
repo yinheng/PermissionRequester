@@ -14,12 +14,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 
-import org.newstand.lib.common.Collections;
-import org.newstand.lib.common.Logger;
-import org.newstand.lib.common.MoreElements;
-import org.newstand.lib.common.SettingsProvider;
-import org.newstand.lib.iface.Adapter;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -47,13 +41,17 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Types;
 
+import github.tornaco.permission.compiler.common.Collections;
+import github.tornaco.permission.compiler.common.Logger;
+import github.tornaco.permission.compiler.common.MoreElements;
+import github.tornaco.permission.compiler.common.SettingsProvider;
 import github.tornaco.permission.requester.RequiresPermission;
 import github.tornaco.permission.requester.RuntimePermissions;
 
+import static github.tornaco.permission.compiler.SourceFiles.writeSourceFile;
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
-import static org.newstand.lib.SourceFiles.writeSourceFile;
 
 /**
  * Created by guohao4 on 2017/9/6.
@@ -116,12 +114,12 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
             return;
         }
         if (type.getKind() != ElementKind.CLASS) {
-            mErrorReporter.abortWithError("@" + Adapter.class.getName() + " only applies to class", type);
+            mErrorReporter.abortWithError("@RuntimePermissions" + " only applies to class", type);
         }
 
         NestingKind nestingKind = type.getNestingKind();
         if (nestingKind != NestingKind.TOP_LEVEL) {
-            mErrorReporter.abortWithError("@" + Adapter.class.getName() + " only applies to top level class", type);
+            mErrorReporter.abortWithError("@RuntimePermissions" + " only applies to top level class", type);
         }
 
         checkModifiersIfNested(type);
@@ -291,6 +289,7 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
             }
             String pkg = p.substring(0, p.lastIndexOf("."));
             String simpleName = p.replace(pkg + ".", "");
+            Logger.debug("pkg: %s, simpleName: %s", pkg, simpleName);
             ClassName c = ClassName.get(pkg, simpleName);
             parameterSpecs.add(ParameterSpec.builder(c, "arg" + i, FINAL).build());
         }
@@ -337,25 +336,26 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
                         "        };\n" +
                         "ON_DENY_METHODS_MAP.put(code, r2);\n";
 
-        MethodSpec.Builder methodSpecBuilder = MethodSpec.methodBuilder(methodName)
-                .addParameters(parameterSpecs)
-                .addParameter(ClassName.bestGuess(typeElement.getQualifiedName().toString()), "activity", FINAL)
-                .addCode(onBeforeCode)
-                .addStatement(permStatement.toString(), permArgs)
-                .addStatement("int code = $L", requestCode)
+        MethodSpec.Builder methodSpecBuilder =
+                MethodSpec.methodBuilder(methodName)
+                        .addParameters(parameterSpecs)
+                        .addParameter(ClassName.bestGuess(typeElement.getQualifiedName().toString()), "activity", FINAL)
+                        .addCode(onBeforeCode)
+                        .addStatement(permStatement.toString(), permArgs)
+                        .addStatement("int code = $L", requestCode)
 
-                .addCode("Runnable r = new Runnable() {\n" +
-                        "            @Override\n" +
-                        "            public void run() {\n" +
-                        "                " +
-                        onGrantPassingArgs.toString() + "\n" +
-                        "            }\n" +
-                        "        };\n")
-                .addStatement("ON_GRANT_METHODS_MAP.put(code, r)")
-                .addCode(onDeniedCode)
-                .addStatement("android.support.v4.app.ActivityCompat.requestPermissions(activity, permissions, code)")
-                .addModifiers(Modifier.STATIC)
-                .addModifiers(Modifier.FINAL);
+                        .addCode("Runnable r = new Runnable() {\n" +
+                                "            @Override\n" +
+                                "            public void run() {\n" +
+                                "                " +
+                                onGrantPassingArgs.toString() + "\n" +
+                                "            }\n" +
+                                "        };\n")
+                        .addStatement("ON_GRANT_METHODS_MAP.put(code, r)")
+                        .addCode(onDeniedCode)
+                        .addStatement("android.support.v4.app.ActivityCompat.requestPermissions(activity, permissions, code)")
+                        .addModifiers(Modifier.STATIC)
+                        .addModifiers(Modifier.FINAL);
         return methodSpecBuilder.build();
     }
 

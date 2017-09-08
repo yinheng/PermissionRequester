@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.List;
+
 import github.tornaco.permission.requester.RequiresPermission;
 import github.tornaco.permission.requester.RuntimePermissions;
 
@@ -83,5 +85,12 @@ public class MainActivity extends AppCompatActivity {
     @RequiresPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION})
     public void doSomeThing2(Context context) {
         Toast.makeText(context, "doSomeThing2", Toast.LENGTH_LONG).show();
+    }
+
+    // Case3.
+    @RequiresPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION})
+    @RequiresPermission.OnDenied("onDoSomethingDenied")
+    public void doSomeThingLongLongLongLongName(CustomObj customObj) {
+        Toast.makeText(this, "doSomeThingLongLongLongLongName", Toast.LENGTH_LONG).show();
     }
 }
