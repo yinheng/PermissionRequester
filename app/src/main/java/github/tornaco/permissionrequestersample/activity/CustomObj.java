@@ -1,4 +1,4 @@
-package github.tornaco.permissionrequestersample;
+package github.tornaco.permissionrequestersample.activity;
 
 /**
  * Created by guohao4 on 2017/9/8.

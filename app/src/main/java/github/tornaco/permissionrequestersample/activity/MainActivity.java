@@ -1,5 +1,5 @@
 
-package github.tornaco.permissionrequestersample;
+package github.tornaco.permissionrequestersample.activity;
 
 import android.Manifest;
 import android.content.Context;
@@ -16,6 +16,7 @@ import java.util.List;
 
 import github.tornaco.permission.requester.RequiresPermission;
 import github.tornaco.permission.requester.RuntimePermissions;
+import github.tornaco.permissionrequestersample.R;
 import github.tornaco.permissionrequestersample.com.comp.deep.WhoAmI;
 
 @RuntimePermissions
@@ -91,7 +92,8 @@ public class MainActivity extends AppCompatActivity {
     // Case3.
     @RequiresPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION})
     @RequiresPermission.OnDenied("onDoSomethingDenied")
-    public void doSomeThingLongLongLongLongName(CustomObj[] CustomObjParamNameLong, List<CustomObj> customObjList, WhoAmI whoAmI) {
+    public void doSomeThingLongLongLongLongName(CustomObj[] CustomObjParamNameLong,
+                                                List<CustomObj> customObjList, WhoAmI whoAmI) {
         Toast.makeText(this, "doSomeThingLongLongLongLongName", Toast.LENGTH_LONG).show();
     }
 }

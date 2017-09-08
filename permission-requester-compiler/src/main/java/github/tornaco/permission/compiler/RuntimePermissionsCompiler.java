@@ -13,7 +13,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,10 +33,8 @@ import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
-import javax.lang.model.util.Types;
 
 import github.tornaco.permission.compiler.common.Collections;
 import github.tornaco.permission.compiler.common.Logger;
@@ -63,19 +60,15 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
     private static final boolean DEBUG = true;
 
     private ErrorReporter mErrorReporter;
-    private Types mTypeUtils;
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         super.init(processingEnvironment);
         mErrorReporter = new ErrorReporter(processingEnvironment);
-        mTypeUtils = processingEnvironment.getTypeUtils();
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-        Logger.debug("process @RuntimePermissions");
-
         Collection<? extends Element> annotatedElements =
                 roundEnvironment.getElementsAnnotatedWith(RuntimePermissions.class);
 
@@ -83,11 +76,7 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
                 .addAll(ElementFilter.typesIn(annotatedElements))
                 .build();
 
-        Logger.debug("Will process %d types of @RuntimePermissions", types.size());
-
-        for (TypeElement type : types) {
-            processType(type);
-        }
+        types.forEach(this::processType);
 
         return true;
     }
@@ -95,7 +84,7 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
     private void processType(TypeElement type) {
         RuntimePermissions annotation = type.getAnnotation(RuntimePermissions.class);
         if (annotation == null) {
-            Logger.report("@RuntimePermissions annotation is null on Type %s", type);
+            mErrorReporter.abortWithError("@RuntimePermissions annotation is null on Type %s", type);
             return;
         }
         if (type.getKind() != ElementKind.CLASS) {
@@ -110,7 +99,10 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
         checkModifiersIfNested(type);
 
         // get the fully-qualified class name
-        String fqClassName = generatedSubclassName(type, 0, "PermissionRequester");
+        if (annotation.classNameSubFix().length() == 0) {
+            mErrorReporter.abortWithError("classNameSubFix should not be empty", type);
+        }
+        String fqClassName = generatedSubclassName(type, 0, annotation.classNameSubFix());
         // class name
         String className = CompilerUtil.simpleNameOf(fqClassName);
         // Create source.
@@ -196,29 +188,26 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
 
         List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
 
-        for (Element e : enclosedElements) {
-            Logger.debug("enclosedElements: %s", e);
-            if (e.getKind() == ElementKind.METHOD) {
-                RequiresPermission requiresPermission = e.getAnnotation(RequiresPermission.class);
-                RequiresPermission.Before before = e.getAnnotation(RequiresPermission.Before.class);
-                RequiresPermission.OnDenied onDenied = e.getAnnotation(RequiresPermission.OnDenied.class);
-                if (requiresPermission != null) {
-                    Logger.debug("RequiresPermission found @:" + e);
-                    try {
-                        methodSpecs.add(createMethodForRequiresPermission(typeElement, e,
-                                before,
-                                onDenied,
-                                requiresPermission));
-                    } catch (Throwable t) {
-                        StringBuilder stacks = new StringBuilder();
-                        for (StackTraceElement se : t.getStackTrace()) {
-                            stacks.append(se.toString()).append("\n");
-                        }
-                        mErrorReporter.abortWithError(stacks.toString(), e);
+        enclosedElements.stream().filter(e -> e.getKind() == ElementKind.METHOD).forEach(e -> {
+            RequiresPermission requiresPermission = e.getAnnotation(RequiresPermission.class);
+            RequiresPermission.Before before = e.getAnnotation(RequiresPermission.Before.class);
+            RequiresPermission.OnDenied onDenied = e.getAnnotation(RequiresPermission.OnDenied.class);
+            if (requiresPermission != null) {
+                Logger.debug("RequiresPermission found @:" + e);
+                try {
+                    methodSpecs.add(createMethodForRequiresPermission(typeElement, e,
+                            before,
+                            onDenied,
+                            requiresPermission));
+                } catch (Throwable t) {
+                    StringBuilder stacks = new StringBuilder();
+                    for (StackTraceElement se : t.getStackTrace()) {
+                        stacks.append(se.toString()).append("\n");
                     }
+                    mErrorReporter.abortWithError(stacks.toString(), e);
                 }
             }
-        }
+        });
         return methodSpecs;
     }
 
@@ -263,11 +252,8 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
         List<? extends VariableElement> varList = exe.getParameters();
         for (VariableElement ve : varList) {
             TypeMirror tm = ve.asType();
-            Logger.debug("tm: %s", tm);
             TypeName tn = TypeName.get(tm);
-            Logger.debug("tn: %s", tn);
             ParameterSpec ps = ParameterSpec.builder(tn, ve.toString(), FINAL).build();
-            Logger.debug("ps: %s", ps);
             parameterSpecs.add(ps);
         }
 
@@ -350,20 +336,6 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
         // In principle type.getEnclosingElement() could be an ExecutableElement (for a class
         // declared inside a method), but since RoundEnvironment.getElementsAnnotatedWith doesn't
         // return such classes we won't see them here.
-    }
-
-    private boolean ancestorIs(TypeElement type, Class<? extends Annotation> clz) {
-        while (true) {
-            TypeMirror parentMirror = type.getSuperclass();
-            if (parentMirror.getKind() == TypeKind.NONE) {
-                return false;
-            }
-            TypeElement parentElement = (TypeElement) mTypeUtils.asElement(parentMirror);
-            if (MoreElements.isAnnotationPresent(parentElement, clz)) {
-                return true;
-            }
-            type = parentElement;
-        }
     }
 
     @Override
