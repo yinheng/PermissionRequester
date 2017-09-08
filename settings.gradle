@@ -1,0 +1,1 @@
+include ':app', ':permission-requester-annotation', ':permission-requester-compiler'
