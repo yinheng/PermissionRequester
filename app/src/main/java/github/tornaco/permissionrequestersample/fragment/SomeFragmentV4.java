@@ -3,6 +3,7 @@ package github.tornaco.permissionrequestersample.fragment;
 import android.Manifest;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -26,15 +27,23 @@ public class SomeFragmentV4 extends Fragment {
     }
 
     public void onDoSomethingDenied() {
-        Toast.makeText(getContext(), "onDoSomethingDenied", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "onDoSomethingDenied@SomeFragmentV4", Toast.LENGTH_LONG).show();
     }
 
     public void onDoSomethingBefore() {
-        Toast.makeText(getContext(), "onDoSomethingBeforeXXX", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "onDoSomethingBeforeXXX@SomeFragmentV4", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        SomeFragmentV4PermissionRequester.doSomeThingChecked("SomeFragmentV4", null, 1, 2, 3, getActivity(), this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Call you helper class here.
+        SomeFragmentV4PermissionRequester.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

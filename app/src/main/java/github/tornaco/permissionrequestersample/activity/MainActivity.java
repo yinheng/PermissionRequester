@@ -18,10 +18,10 @@ import github.tornaco.permission.requester.RequiresPermission;
 import github.tornaco.permission.requester.RuntimePermissions;
 import github.tornaco.permissionrequestersample.R;
 import github.tornaco.permissionrequestersample.com.comp.deep.WhoAmI;
+import github.tornaco.permissionrequestersample.fragment.SomeFragmentV4;
 
 @RuntimePermissions
-public
-class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     private TextView mTextMessage;
 
@@ -36,7 +36,8 @@ class MainActivity extends AppCompatActivity {
                     return true;
                 case R.id.navigation_dashboard:
                     mTextMessage.setText(R.string.title_dashboard);
-                    MainActivityPermissionRequester.doSomeThing2Checked(getApplicationContext(), MainActivity.this);
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.content, new SomeFragmentV4()).commitAllowingStateLoss();
                     return true;
                 case R.id.navigation_notifications:
                     mTextMessage.setText(R.string.title_notifications);

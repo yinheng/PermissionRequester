@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.Toast;
@@ -36,5 +37,13 @@ public class SomeFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        SomeFragmentPermissionRequester.doSomeThingChecked("SomeFragmentV4", null, 1, 2, 3, getActivity(), this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Call you helper class here.
+        SomeFragmentPermissionRequester.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

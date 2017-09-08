@@ -336,7 +336,7 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
                         .addStatement(
                                 isActivity ?
                                         "android.support.v4.app.ActivityCompat.requestPermissions(host, permissions, code)"
-                                        : "android.support.v4.app.ActivityCompat.requestPermissions(host.getActivity(), permissions, code)")
+                                        : "host.requestPermissions(permissions, code)")
                         .addModifiers(Modifier.STATIC)
                         .addModifiers(Modifier.FINAL);
         return methodSpecBuilder.build();
