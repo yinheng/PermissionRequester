@@ -9,7 +9,7 @@ package github.tornaco.permission.compiler.common;
 public abstract class Logger {
 
     public static void debug(String message, Object... obj) {
-        System.out.println("****" + String.format(message, obj));
+        System.out.println("---------------------" + String.format(message, obj));
     }
 
     public static void report(String message, Object... obj) {

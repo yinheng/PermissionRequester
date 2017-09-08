@@ -2,7 +2,6 @@ package github.tornaco.permission.compiler;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -15,14 +14,11 @@ import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -32,10 +28,12 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
@@ -60,25 +58,12 @@ import static javax.lang.model.element.Modifier.STATIC;
 @SupportedAnnotationTypes("github.tornaco.permission.requester.RuntimePermissions")
 public class RuntimePermissionsCompiler extends AbstractProcessor {
 
-    private static final Map<String, Type> PRIMITIVE_TYPES = Maps.newHashMap();
-
     private static final AtomicInteger REQUEST_CODE = new AtomicInteger(0x999);
 
     private static final boolean DEBUG = true;
 
     private ErrorReporter mErrorReporter;
     private Types mTypeUtils;
-
-    static {
-        PRIMITIVE_TYPES.put("int", int.class);
-        PRIMITIVE_TYPES.put("boolean", boolean.class);
-        PRIMITIVE_TYPES.put("float", float.class);
-        PRIMITIVE_TYPES.put("double", double.class);
-        PRIMITIVE_TYPES.put("long", long.class);
-        PRIMITIVE_TYPES.put("char", char.class);
-        PRIMITIVE_TYPES.put("byte", byte.class);
-        PRIMITIVE_TYPES.put("short", short.class);
-    }
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
@@ -272,26 +257,18 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
 
         String methodName = e.getSimpleName().toString();
 
-        // Params.
-        String fullMethodName = e.toString();
-        fullMethodName = fullMethodName.replace(methodName, "");
-        fullMethodName = fullMethodName.replace("(", "").replace(")", "");
-
-        StringTokenizer tokenizer = new StringTokenizer(fullMethodName, ",");
-        int paramCount = tokenizer.countTokens();
-        List<ParameterSpec> parameterSpecs = new ArrayList<>(paramCount);
-        for (int i = 0; i < paramCount; i++) {
-            String p = tokenizer.nextToken();
-            if (PRIMITIVE_TYPES.containsKey(p)) {
-                Type type = PRIMITIVE_TYPES.get(p);
-                parameterSpecs.add(ParameterSpec.builder(type, "arg" + i, FINAL).build());
-                continue;
-            }
-            String pkg = p.substring(0, p.lastIndexOf("."));
-            String simpleName = p.replace(pkg + ".", "");
-            Logger.debug("pkg: %s, simpleName: %s", pkg, simpleName);
-            ClassName c = ClassName.get(pkg, simpleName);
-            parameterSpecs.add(ParameterSpec.builder(c, "arg" + i, FINAL).build());
+        // Retrieve all params.
+        List<ParameterSpec> parameterSpecs = new ArrayList<>();
+        ExecutableElement exe = MoreElements.asExecutable(e);
+        List<? extends VariableElement> varList = exe.getParameters();
+        for (VariableElement ve : varList) {
+            TypeMirror tm = ve.asType();
+            Logger.debug("tm: %s", tm);
+            TypeName tn = TypeName.get(tm);
+            Logger.debug("tn: %s", tn);
+            ParameterSpec ps = ParameterSpec.builder(tn, ve.toString(), FINAL).build();
+            Logger.debug("ps: %s", ps);
+            parameterSpecs.add(ps);
         }
 
         // Method name.
@@ -310,9 +287,10 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
 
         String methodToCallInRunnable = e.getSimpleName().toString();
         StringBuilder onGrantPassingArgs = new StringBuilder("activity." + methodToCallInRunnable + "(");
-        for (int i = 0; i < paramCount; i++) {
+        for (int i = 0; i < parameterSpecs.size(); i++) {
             ParameterSpec parameterSpec = parameterSpecs.get(i);
-            if (i != paramCount - 1) onGrantPassingArgs.append(parameterSpec.name).append(", ");
+            if (i != parameterSpecs.size() - 1)
+                onGrantPassingArgs.append(parameterSpec.name).append(", ");
             else onGrantPassingArgs.append(parameterSpec.name);
         }
         onGrantPassingArgs.append(");");
