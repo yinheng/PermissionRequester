@@ -7,7 +7,7 @@
 > Please setup your gradle project as below:
 
 * Add dependency
-```
+```shell
 provided github.tornaco.permission-requester-annotations:1.0
 ```
 
@@ -25,8 +25,17 @@ public class MainActivity extends AppCompatActivity {}
     public void doSomeThing(String param1, View param2, int param3, float param4, double p5, Context context) {
         Toast.makeText(context, param1 + param2 + param3 + param4 + p5, Toast.LENGTH_LONG).show();
     }
+    
+    
+    public void onDoSomethingDenied() {
+        Toast.makeText(this, "onDoSomethingDenied", Toast.LENGTH_LONG).show();
+    }
+
+    public void onDoSomethingBefore() {
+        Toast.makeText(this, "onDoSomethingBeforeXXX", Toast.LENGTH_LONG).show();
+    }
 ```
-The ``OnDenied``` and ```Before``` is optional.
+
 
 * Add below line in your activity or fragment
 ```java
