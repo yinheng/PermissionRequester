@@ -7,8 +7,8 @@
 > Please setup your gradle project as below:
 
 * Add dependency
-```shell
-provided github.tornaco.permission-requester-annotations:1.0
+```
+provided 'github.tornaco:permission-requester-annotation:1.0'
 ```
 
 * Annotate your Activity or Fragment class
