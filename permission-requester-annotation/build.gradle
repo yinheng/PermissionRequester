@@ -1,4 +1,7 @@
 apply plugin: 'java'
+// apply plugin: 'com.github.dcendents.android-maven'
+// apply plugin: 'com.jfrog.bintray'
+
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -6,3 +9,89 @@ dependencies {
 
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
+
+def siteUrl = 'https://github.com/Tornaco/PermissionRequester'    // project homepage
+def gitUrl = 'https://github.com/Tornaco/PermissionRequester.git' // project git
+
+group = "github.tornaco"
+version = "1.0"
+
+//install {
+//    repositories.mavenInstaller {
+//        // This generates POM.xml with proper parameters
+//        pom {
+//            project {
+//                packaging 'aar'
+//                name 'Runtime permission requester auto generation for Android M+'
+//                url siteUrl
+//                licenses {
+//                    license {
+//                        name 'The Apache Software License, Version 2.0'
+//                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+//                    }
+//                }
+//                developers {
+//                    developer {
+//                        id 'potestadetornaco'
+//                        name 'potestadetornaco'
+//                        email 'tornaco@163.com'
+//                    }
+//                }
+//                scm {
+//                    connection gitUrl
+//                    developerConnection gitUrl
+//                    url siteUrl
+//                }
+//            }
+//        }
+//    }
+//}
+//
+////task sourcesJar(type: Jar) {
+////    from android.sourceSets.main.java.srcDirs
+////    classifier = 'sources'
+////}
+//
+////
+////task javadoc(type: Javadoc) {
+////    source = android.sourceSets.main.java.srcDirs
+////    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+////}
+//
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
+//}
+//
+//artifacts {
+//    archives javadocJar
+////    archives sourcesJar
+//}
+//
+//// javadoc configuration
+//javadoc {
+//    options{
+//        encoding "UTF-8"
+//        charSet 'UTF-8'
+//        author true
+//        links "http://docs.oracle.com/javase/7/docs/api"
+//    }
+//}
+//
+//Properties properties = new Properties()
+//properties.load(project.rootProject.file('local.properties').newDataInputStream())
+//
+//bintray {
+//    user = properties.getProperty("bintray.user")
+//    key = properties.getProperty("bintray.apikey")
+//    configurations = ['archives']
+//    pkg {
+//        repo = "android"
+//        name = "permission-requester-annotations"
+//        // #CONFIG# project name in jcenter
+//        websiteUrl = siteUrl
+//        vcsUrl = gitUrl
+//        licenses = ["Apache-2.0"]
+//        publish = true
+//    }
+//}
