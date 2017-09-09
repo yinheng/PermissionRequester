@@ -3,12 +3,18 @@
 ## Why I create this project?
 > Learing gradle plugin development, and I love the feeling of code auto generation.
 
+## Status and version
+
+[ ![Download](https://api.bintray.com/packages/potestadetornaco/android/permission-requester-compiler/images/download.svg?version=1.0) ](https://bintray.com/potestadetornaco/android/permission-requester-compiler/1.0/link)
+
+
 ## How to use in your projects?
 > Please setup your gradle project as below:
 
 * Add dependency
 ```
 provided 'github.tornaco:permission-requester-annotation:1.0'
+annotationProcessor 'github.tornaco:permission-requester-compiler:1.0'
 ```
 
 * Annotate your Activity or Fragment class
