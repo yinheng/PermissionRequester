@@ -5,7 +5,7 @@
 
 ## Status and version
 
-[ ![Download](https://api.bintray.com/packages/potestadetornaco/android/permission-requester-compiler/images/download.svg?version=1.0) ](https://bintray.com/potestadetornaco/android/permission-requester-compiler/1.0/link)
+[ ![Download](https://api.bintray.com/packages/potestadetornaco/android/permission-requester-compiler/images/download.svg?version=1.1) ](https://bintray.com/potestadetornaco/android/permission-requester-compiler/1.1/link)
 
 
 ## How to use in your projects?
@@ -13,8 +13,8 @@
 
 * Add dependency
 ```
-provided 'github.tornaco:permission-requester-annotation:1.0'
-annotationProcessor 'github.tornaco:permission-requester-compiler:1.0'
+provided 'github.tornaco:permission-requester-annotation:1.1'
+annotationProcessor 'github.tornaco:permission-requester-compiler:1.1'
 ```
 
 * Annotate your Activity or Fragment class
