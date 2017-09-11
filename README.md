@@ -12,7 +12,7 @@
 > Please setup your gradle project as below:
 
 * Add dependency
-```
+```gradle
 dependencies {
 ...
 
