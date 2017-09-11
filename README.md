@@ -13,8 +13,12 @@
 
 * Add dependency
 ```
+dependencies {
+...
+
 provided 'github.tornaco:permission-requester-annotation:1.1'
 annotationProcessor 'github.tornaco:permission-requester-compiler:1.1'
+}
 ```
 
 * Annotate your Activity or Fragment class
