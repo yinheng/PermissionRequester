@@ -1,1 +1,1 @@
-include ':app', ':permission-requester-annotation', ':permission-requester-compiler'
+include ':app', ':permission-requester-annotation', ':permission-requester-compiler', ':bintray'

@@ -14,7 +14,7 @@ def siteUrl = 'https://github.com/Tornaco/PermissionRequester'    // project hom
 def gitUrl = 'https://github.com/Tornaco/PermissionRequester.git' // project git
 
 group = "github.tornaco"
-version = "1.0"
+version = "1.1"
 
 install {
     repositories.mavenInstaller {
@@ -47,16 +47,10 @@ install {
     }
 }
 
-//task sourcesJar(type: Jar) {
-//    from android.sourceSets.main.java.srcDirs
-//    classifier = 'sources'
-//}
-
-//
-//task javadoc(type: Javadoc) {
-//    source = android.sourceSets.main.java.srcDirs
-//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-//}
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
     classifier = 'javadoc'
@@ -64,8 +58,18 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 }
 
 artifacts {
-  //  archives javadocJar
-//    archives sourcesJar
+    archives javadocJar
+    archives sourcesJar
+}
+
+// javadoc configuration
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        links "http://docs.oracle.com/javase/7/docs/api"
+    }
 }
 
 Properties properties = new Properties()

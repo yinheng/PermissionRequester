@@ -458,10 +458,6 @@ public final class MoreTypes {
         return mirror == null ? 0 : mirror.accept(HASH_VISITOR, visiting);
     }
 
-    /**
-     * Returns the set of {@linkplain TypeElement types} that are referenced by the given
-     * {@link TypeMirror}.
-     */
     public static ImmutableSet<TypeElement> referencedTypes(TypeMirror type) {
         checkNotNull(type);
         ImmutableSet.Builder<TypeElement> elements = ImmutableSet.builder();
@@ -504,15 +500,6 @@ public final class MoreTypes {
         return elements.build();
     }
 
-    /**
-     * An alternate implementation of {@link Types#asElement} that does not require a {@link Types}
-     * instance with the notable difference that it will throw {@link IllegalArgumentException}
-     * instead of returning null if the {@link TypeMirror} can not be converted to an {@link Element}.
-     *
-     * @throws NullPointerException     if {@code typeMirror} is {@code null}
-     * @throws IllegalArgumentException if {@code typeMirror} cannot be converted to an
-     *                                  {@link Element}
-     */
     public static Element asElement(TypeMirror typeMirror) {
         return typeMirror.accept(AS_ELEMENT_VISITOR, null);
     }
@@ -554,10 +541,6 @@ public final class MoreTypes {
         return builder.build();
     }
 
-    /**
-     * Returns a {@link ArrayType} if the {@link TypeMirror} represents a primitive array or
-     * throws an {@link IllegalArgumentException}.
-     */
     public static ArrayType asArray(TypeMirror maybeArrayType) {
         return maybeArrayType.accept(new CastingTypeVisitor<ArrayType>() {
             @Override
@@ -567,10 +550,6 @@ public final class MoreTypes {
         }, "primitive array");
     }
 
-    /**
-     * Returns a {@link DeclaredType} if the {@link TypeMirror} represents a declared type such
-     * as a class, interface, union/compound, or enum or throws an {@link IllegalArgumentException}.
-     */
     public static DeclaredType asDeclared(TypeMirror maybeDeclaredType) {
         return maybeDeclaredType.accept(new CastingTypeVisitor<DeclaredType>() {
             @Override
@@ -580,10 +559,6 @@ public final class MoreTypes {
         }, "declared type");
     }
 
-    /**
-     * Returns a {@link ExecutableType} if the {@link TypeMirror} represents an executable type such
-     * as may result from missing code, or bad compiles or throws an {@link IllegalArgumentException}.
-     */
     public static ErrorType asError(TypeMirror maybeErrorType) {
         return maybeErrorType.accept(new CastingTypeVisitor<ErrorType>() {
             @Override
@@ -593,10 +568,6 @@ public final class MoreTypes {
         }, "error type");
     }
 
-    /**
-     * Returns a {@link ExecutableType} if the {@link TypeMirror} represents an executable type such
-     * as a method, constructor, or initializer or throws an {@link IllegalArgumentException}.
-     */
     public static ExecutableType asExecutable(TypeMirror maybeExecutableType) {
         return maybeExecutableType.accept(new CastingTypeVisitor<ExecutableType>() {
             @Override
@@ -606,10 +577,6 @@ public final class MoreTypes {
         }, "executable type");
     }
 
-    /**
-     * Returns a {@link NoType} if the {@link TypeMirror} represents an non-type such
-     * as void, or package, etc. or throws an {@link IllegalArgumentException}.
-     */
     public static NoType asNoType(TypeMirror maybeNoType) {
         return maybeNoType.accept(new CastingTypeVisitor<NoType>() {
             @Override
@@ -619,10 +586,6 @@ public final class MoreTypes {
         }, "non-type");
     }
 
-    /**
-     * Returns a {@link NullType} if the {@link TypeMirror} represents the null type
-     * or throws an {@link IllegalArgumentException}.
-     */
     public static NullType asNullType(TypeMirror maybeNullType) {
         return maybeNullType.accept(new CastingTypeVisitor<NullType>() {
             @Override
@@ -632,10 +595,6 @@ public final class MoreTypes {
         }, "null");
     }
 
-    /**
-     * Returns a {@link PrimitiveType} if the {@link TypeMirror} represents a primitive type
-     * or throws an {@link IllegalArgumentException}.
-     */
     public static PrimitiveType asPrimitiveType(TypeMirror maybePrimitiveType) {
         return maybePrimitiveType.accept(new CastingTypeVisitor<PrimitiveType>() {
             @Override
@@ -645,14 +604,6 @@ public final class MoreTypes {
         }, "primitive type");
     }
 
-    //
-    // visitUnionType would go here, but it is a 1.7 API.
-    //
-
-    /**
-     * Returns a {@link TypeVariable} if the {@link TypeMirror} represents a type variable
-     * or throws an {@link IllegalArgumentException}.
-     */
     public static TypeVariable asTypeVariable(TypeMirror maybeTypeVariable) {
         return maybeTypeVariable.accept(new CastingTypeVisitor<TypeVariable>() {
             @Override
@@ -662,10 +613,6 @@ public final class MoreTypes {
         }, "type variable");
     }
 
-    /**
-     * Returns a {@link WildcardType} if the {@link TypeMirror} represents a wildcard type
-     * or throws an {@link IllegalArgumentException}.
-     */
     public static WildcardType asWildcard(WildcardType maybeWildcardType) {
         return maybeWildcardType.accept(new CastingTypeVisitor<WildcardType>() {
             @Override
@@ -675,11 +622,6 @@ public final class MoreTypes {
         }, "wildcard type");
     }
 
-    /**
-     * Returns true if the raw type underlying the given {@link TypeMirror} represents a type that can
-     * be referenced by a {@link Class}. If this returns true, then {@link #isTypeOf} is guaranteed to
-     * not throw.
-     */
     public static boolean isType(TypeMirror type) {
         return type.accept(new SimpleTypeVisitor6<Boolean, Void>() {
             @Override
@@ -709,11 +651,6 @@ public final class MoreTypes {
         }, null);
     }
 
-    /**
-     * Returns true if the raw type underlying the given {@link TypeMirror} represents the
-     * same raw type as the given {@link Class} and throws an IllegalArgumentException if the
-     * {@link TypeMirror} does not represent a type that can be referenced by a {@link Class}
-     */
     public static boolean isTypeOf(final Class<?> clazz, TypeMirror type) {
         checkNotNull(clazz);
         return type.accept(new SimpleTypeVisitor6<Boolean, Void>() {
@@ -773,10 +710,6 @@ public final class MoreTypes {
         }, null);
     }
 
-    /**
-     * Returns the non-object superclass of the type with the proper type parameters.
-     * An absent Optional is returned if there is no non-Object superclass.
-     */
     public static Optional<DeclaredType> nonObjectSuperclass(final Types types, Elements elements,
                                                              DeclaredType type) {
         checkNotNull(types);
@@ -802,13 +735,6 @@ public final class MoreTypes {
                 : Optional.<DeclaredType>absent();
     }
 
-    /**
-     * Resolves a {@link VariableElement} parameter to a method or constructor based on the given
-     * container, or a member of a class. For parameters to a method or constructor, the variable's
-     * enclosing element must be a supertype of the container type. For example, given a
-     * {@code container} of type {@code Set<String>}, and a variable corresponding to the {@code E e}
-     * parameter in the {@code Set.add(E e)} method, this will return a TypeMirror for {@code String}.
-     */
     public static TypeMirror asMemberOf(Types types, DeclaredType container,
                                         VariableElement variable) {
         if (variable.getKind().equals(ElementKind.PARAMETER)) {

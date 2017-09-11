@@ -26,25 +26,12 @@ import javax.lang.model.element.PackageElement;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static javax.lang.model.element.ElementKind.PACKAGE;
 
-/**
- * Represents the visibility of a given {@link Element}: {@code public}, {@code protected},
- * {@code private} or default/package-private.
- * <p/>
- * <p>The constants for this enum are ordered according by increasing visibility.
- *
- * @author Gregory Kick
- */
 public enum Visibility {
     PRIVATE,
     DEFAULT,
     PROTECTED,
     PUBLIC;
 
-    /**
-     * Returns the visibility of the given {@link Element}. While package elements don't technically
-     * have a visibility associated with them, this method returns {@link #PUBLIC} for
-     * {@link PackageElement} instances.
-     */
     public static Visibility ofElement(Element element) {
         checkNotNull(element);
         // packages don't have modifiers, but they're obviously "public"
@@ -63,10 +50,6 @@ public enum Visibility {
         }
     }
 
-    /**
-     * Returns effective visibility of the given element meaning that it takes into account the
-     * visibility of its enclosing elements.
-     */
     public static Visibility effectiveVisibilityOfElement(Element element) {
         checkNotNull(element);
         Visibility effectiveVisibility = PUBLIC;

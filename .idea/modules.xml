@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/PermissionRequester2.iml" filepath="$PROJECT_DIR$/PermissionRequester2.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bintray/bintray.iml" filepath="$PROJECT_DIR$/bintray/bintray.iml" />
       <module fileurl="file://$PROJECT_DIR$/permission-requester-annotation/permission-requester-annotation.iml" filepath="$PROJECT_DIR$/permission-requester-annotation/permission-requester-annotation.iml" />
       <module fileurl="file://$PROJECT_DIR$/permission-requester-compiler/permission-requester-compiler.iml" filepath="$PROJECT_DIR$/permission-requester-compiler/permission-requester-compiler.iml" />
     </modules>
