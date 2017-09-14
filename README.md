@@ -48,6 +48,9 @@ public class MainActivity extends AppCompatActivity {}
 
 
 * Add below line in your activity or fragment
+
+Activity
+
 ```java
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -55,6 +58,8 @@ public class MainActivity extends AppCompatActivity {}
         MainActivityPermissionRequester.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 ```
+
+Fragment
 
 ```java
     @Override
@@ -67,6 +72,7 @@ public class MainActivity extends AppCompatActivity {}
 
 * Now you can call your original method with subfix instead.
 ```java
+... // Some code.
 MainActivityPermissionRequester
                             .doSomeThingChecked("Hello2", mTextMessage, 2018, 12.3f, 2222d,
                                     getApplicationContext(),
