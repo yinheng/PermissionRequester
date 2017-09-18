@@ -32,6 +32,6 @@ dependencies {
     compile 'com.android.support:design:26.+'
     testCompile 'junit:junit:4.12'
 
-    //provided 'github.tornaco:permission-requester-annotation:1.1'
-    //annotationProcessor 'github.tornaco:permission-requester-compiler:1.1'
+    provided 'github.tornaco:permission-requester-annotation:1.2'
+    annotationProcessor 'github.tornaco:permission-requester-compiler:1.3'
 }

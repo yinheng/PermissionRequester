@@ -190,6 +190,20 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
 
         methodSpecs.add(createOnPermissionRequestResultMethod());
 
+        methodSpecs.add(MethodSpec.methodBuilder("checkSelfPermissions")
+                .addParameter(ClassName.get("android.content", "Context"), "context")
+                .addParameter(String[].class, "perms")
+                .addModifiers(Modifier.STATIC)
+                .returns(TypeName.BOOLEAN)
+                .addCode("for (String p : perms) {\n" +
+                        "            if (android.support.v4.app.ActivityCompat.checkSelfPermission(context, p)\n" +
+                        "                    != android.content.pm.PackageManager.PERMISSION_GRANTED) {\n" +
+                        "                return false;\n" +
+                        "            }\n" +
+                        "        }\n" +
+                        "        return true;\n")
+                .build());
+
         List<? extends Element> enclosedElements = typeElement.getEnclosedElements();
 
         enclosedElements.stream().filter(e -> e.getKind() == ElementKind.METHOD).forEach(e -> {
@@ -320,8 +334,13 @@ public class RuntimePermissionsCompiler extends AbstractProcessor {
                 MethodSpec.methodBuilder(methodName)
                         .addParameters(parameterSpecs)
                         .addParameter(ClassName.bestGuess(typeElement.getQualifiedName().toString()), "host", FINAL)
-                        .addCode(onBeforeCode)
                         .addStatement(permStatement.toString(), permArgs)
+                        .addCode(String.format("if (checkSelfPermissions(%s, permissions))" +
+                                        "{" +
+                                        "" + onGrantPassingArgs.toString() + "\n" +
+                                        " return;}\n",
+                                isActivity ? "host" : "host.getActivity()"))
+                        .addCode(onBeforeCode)
                         .addStatement("int code = $L", requestCode)
 
                         .addCode("Runnable r = new Runnable() {\n" +

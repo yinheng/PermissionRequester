@@ -5,7 +5,7 @@
 
 ## Status and version
 
-[ ![Download](https://api.bintray.com/packages/potestadetornaco/android/permission-requester-compiler/images/download.svg?version=1.1) ](https://bintray.com/potestadetornaco/android/permission-requester-compiler/1.1/link)
+[ ![Download](https://api.bintray.com/packages/potestadetornaco/android/permission-requester-compiler/images/download.svg?version=1.3) ](https://bintray.com/potestadetornaco/android/permission-requester-compiler/1.3/link)
 
 
 ## How to use in your projects?
@@ -16,8 +16,8 @@
 dependencies {
 ...
 
-provided 'github.tornaco:permission-requester-annotation:1.1'
-annotationProcessor 'github.tornaco:permission-requester-compiler:1.1'
+provided 'github.tornaco:permission-requester-annotation:1.2'
+annotationProcessor 'github.tornaco:permission-requester-compiler:1.3'
 }
 ```
 
