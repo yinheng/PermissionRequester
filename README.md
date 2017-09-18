@@ -16,8 +16,8 @@
 dependencies {
 ...
 
-provided 'github.tornaco:permission-requester-annotation:1.2'
-annotationProcessor 'github.tornaco:permission-requester-compiler:1.3'
+provided 'github.tornaco:permission-requester-annotation:$version'
+annotationProcessor 'github.tornaco:permission-requester-compiler:$version'
 }
 ```
 
