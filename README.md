@@ -11,7 +11,7 @@
 ## How to use in your projects?
 > Please setup your gradle project as below:
 
-* Add dependency
+1. Add dependency in gradle build script
 ```gradle
 dependencies {
 ...
@@ -21,13 +21,13 @@ annotationProcessor 'github.tornaco:permission-requester-compiler:1.3'
 }
 ```
 
-* Annotate your Activity or Fragment class
+2. Annotate your Activity or Fragment class
 ```java
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity {}
 ```
 
-* Annotate your method that need to check permissions
+3. Annotate your method that need to check permissions
 ```java
     @RequiresPermission.Before("onDoSomethingBefore")
     @RequiresPermission({Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_CONTACTS})
@@ -47,7 +47,10 @@ public class MainActivity extends AppCompatActivity {}
 ```
 
 
-* Add below line in your activity or fragment
+4. Add below line in your activity or fragment
+
+Activity
+
 ```java
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -55,6 +58,8 @@ public class MainActivity extends AppCompatActivity {}
         MainActivityPermissionRequester.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 ```
+
+Fragment
 
 ```java
     @Override
@@ -65,8 +70,9 @@ public class MainActivity extends AppCompatActivity {}
     }
 ```
 
-* Now you can call your original method with subfix instead.
+5. Now you can call your original method with subfix instead.
 ```java
+... // Some code.
 MainActivityPermissionRequester
                             .doSomeThingChecked("Hello2", mTextMessage, 2018, 12.3f, 2222d,
                                     getApplicationContext(),
