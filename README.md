@@ -20,6 +20,7 @@ provided 'github.tornaco:permission-requester-annotation:$version'
 annotationProcessor 'github.tornaco:permission-requester-compiler:$version'
 }
 ```
+1.1 Change ```provide``` to ```compile``` since 1.4
 
 2. Annotate your Activity or Fragment class
 ```java
